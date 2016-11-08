@@ -103,7 +103,7 @@ public abstract class Critter {
 	private int dir;
 	private	static List<Critter> population = new java.util.ArrayList<Critter>();
 	private static List<Critter> babies = new java.util.ArrayList<Critter>();
-
+	private static Critter[][] critterworld;
 	// Gets the package name.  This assumes that Critter and its subclasses are all in the same package.
 	static {
 		myPackage = Critter.class.getPackage().toString().split(" ")[1];
@@ -431,30 +431,18 @@ public abstract class Critter {
 			return super.y_coord;
 		}
 		
-
-		/*
-		 * This method getPopulation has to be modified by you if you are not using the population
-		 * ArrayList that has been provided in the starter code.  In any case, it has to be
-		 * implemented for grading tests to work.
-		 */
+		//returns the list of critters
 		protected static List<Critter> getPopulation() {
 			return population;
 		}
 		
-		/*
-		 * This method getBabies has to be modified by you if you are not using the babies
-		 * ArrayList that has been provided in the starter code.  In any case, it has to be
-		 * implemented for grading tests to work.  Babies should be added to the general population 
-		 * at either the beginning OR the end of every timestep.
-		 */
+		//returns the list of babies
 		protected static List<Critter> getBabies() {
 			return babies;
 		}
 	}
 	
-	/**
-	 * Clear the world of all critters, dead and alive
-	 */
+	//Clears the world of all critters, dead or alive
 	public static void clearWorld() {
 		for(int a = 0; a < population.size(); a++){
 			Critter temp = population.get(a);
@@ -520,12 +508,17 @@ public abstract class Critter {
 		}	
 	}
 	
+	//returns the world of critters
+	public static Critter[][] getCritters(){
+		return critterworld;
+	}
+	
 	//prints out the world's grid and all of the critters contained within it
 	public static void displayWorld() {
 		int numCols = Params.world_width;
 		int numRows = Params.world_height;
 		
-		Critter[][] critterworld = new Critter[numRows][numCols];
+		critterworld = new Critter[numRows][numCols];
 		
 		//nulls
 		for(int x = 0; x < numRows; x++){
@@ -540,7 +533,7 @@ public abstract class Critter {
 		}
 		
 		//draw grid
-		Main.start(critterworld);
+
 	}
 	
 }
