@@ -431,30 +431,18 @@ public abstract class Critter {
 			return super.y_coord;
 		}
 		
-
-		/*
-		 * This method getPopulation has to be modified by you if you are not using the population
-		 * ArrayList that has been provided in the starter code.  In any case, it has to be
-		 * implemented for grading tests to work.
-		 */
+		//returns the list of critters
 		protected static List<Critter> getPopulation() {
 			return population;
 		}
 		
-		/*
-		 * This method getBabies has to be modified by you if you are not using the babies
-		 * ArrayList that has been provided in the starter code.  In any case, it has to be
-		 * implemented for grading tests to work.  Babies should be added to the general population 
-		 * at either the beginning OR the end of every timestep.
-		 */
+		//returns the list of babies
 		protected static List<Critter> getBabies() {
 			return babies;
 		}
 	}
 	
-	/**
-	 * Clear the world of all critters, dead and alive
-	 */
+	//Clears the world of all critters, dead or alive
 	public static void clearWorld() {
 		for(int a = 0; a < population.size(); a++){
 			Critter temp = population.get(a);
@@ -522,50 +510,25 @@ public abstract class Critter {
 	
 	//prints out the world's grid and all of the critters contained within it
 	public static void displayWorld() {
-		int numCols = 2+Params.world_width;
-		int numRows = 2+Params.world_height;
+		int numCols = Params.world_width;
+		int numRows = Params.world_height;
 		
-		String[][] world = new String[numRows][numCols];
+		Critter[][] critterworld = new Critter[numRows][numCols];
 		
-		//white spaces
-		for(int x = 0; x < numRows; x++)
-		{
-			for(int y = 0; y < numCols; y++)
-			{
-				world[x][y] = " ";
+		//nulls
+		for(int x = 0; x < numRows; x++){
+			for(int y = 0; y < numCols; y++){
+				critterworld[x][y] = null;
 			}
 		}
-		//top and bottom rows
-		for(int a = 0; a < numCols; a++)
-		{
-			world[0][a] = "-";
-			world[numRows-1][a] = "-";
-		}
-		//left and right sides
-		for(int b = 0; b < numRows; b++)
-		{
-			world[b][0] = "|";
-			world[b][numCols-1] = "|";
-		}
-		//corners
-		world[0][0] = "+";
-		world[0][numCols-1] = "+";
-		world[numRows-1][0] = "+";
-		world[numRows-1][numCols-1] = "+";
+		
 		//critter positions
-		for(Critter temp : population)
-		{
-			world[(temp.y_coord)+1][(temp.x_coord)+1] = temp.toString();
+		for(Critter temp : population){
+			critterworld[temp.y_coord][temp.x_coord] = temp;
 		}
 		
-		for(int k = 0; k < numRows; k++)
-		{
-			for(int m = 0; m < numCols; m++)
-			{
-				System.out.print(world[k][m]);
-			}
-			System.out.println();
-		}
+		//draw grid
+		Main.start(critterworld);
 	}
 	
 }
