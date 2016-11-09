@@ -39,24 +39,26 @@ public abstract class Critter {
 	
 	public abstract CritterShape viewShape(); 
 	
-	private static Shape getIcon(CritterShape x, Color outline, Color fill, Color total) {
+	public static Shape getIcon(CritterShape x, Color outline, Color fill, Color total) {
 		Shape s = null; 
-		double width = (500 + (Params.world_width/2))/Params.world_width;
-		double height = (500 + (Params.world_height/2))/Params.world_height;
-		double widthoffset = width/15;
-		double heightoffset = height/15;
+		//double width = (500 + (Params.world_width/2))/Params.world_width;
+		//double height = (500 + (Params.world_height/2))/Params.world_height;
+		int width = 500/Params.world_width;
+		int height = 500/Params.world_height;
+		double widthoffset = width/12;
+		double heightoffset = height/12;
 		if(!total.equals(Color.WHITE)){
 			fill = total;
 			outline = total;
 		}
 		switch(x) { 
 			case CIRCLE: 
-				s = new Ellipse(width/2, height/2);
+				s = new Ellipse((width/2)-1, (height/2)-1);
 				s.setFill(fill); 
 				s.setStroke(outline);
 				break;
 			case SQUARE: 
-				s = new Rectangle(width, height);
+				s = new Rectangle(width-1, height-1);
 				s.setFill(fill); 
 				s.setStroke(outline); 
 				break;
@@ -82,12 +84,12 @@ public abstract class Critter {
 			case STAR: 
 				s = new Polygon();
 				((Polygon) s).getPoints().addAll(new Double[]{
-						0.0 + widthoffset + width/2, 0.0 + heightoffset,
+						0.0 + width/2, 0.0 + heightoffset,
 						0.0 + width/2 + width/7, 0.0 + height/2 - height/7,
-						0.0 - widthoffset + width, 0.0 + heightoffset + height/2 - height/7,
+						0.0 - widthoffset + width, 0.0 + height/2 - height/7,
 						0.0 + width/2 + width/7, 0.0 + height/2,
 						0.0 - widthoffset + width, 0.0 - heightoffset + height,
-						0.0 + width/2, 0.0 + height/2,
+						0.0 + width/2, 0.0 + height/2 + height/10,
 						0.0 + widthoffset, 0.0 - heightoffset + height,
 						0.0 + width/2 - width/7, 0.0 + height/2,
 						0.0 + widthoffset, 0.0 + height/2 - height/7,
@@ -103,7 +105,7 @@ public abstract class Critter {
 	private int dir;
 	private	static List<Critter> population = new java.util.ArrayList<Critter>();
 	private static List<Critter> babies = new java.util.ArrayList<Critter>();
-
+	private static Critter[][] critterworld;
 	// Gets the package name.  This assumes that Critter and its subclasses are all in the same package.
 	static {
 		myPackage = Critter.class.getPackage().toString().split(" ")[1];
@@ -323,7 +325,7 @@ public abstract class Critter {
 	public static void makeCritter(String critter_class_name) throws InvalidCritterException {
 		try{
 			//gets the Class of the desired critter types, then gets its constructor and creates a new instance of it
-			Class<?> cls = Class.forName("assignment4." + critter_class_name);
+			Class<?> cls = Class.forName("assignment5." + critter_class_name);
 			Constructor<?> newConstructor = cls.getConstructor();
 			Object obj = newConstructor.newInstance();
 			Critter newCritter = (Critter)obj;
@@ -353,7 +355,7 @@ public abstract class Critter {
 		List<Critter> result = new java.util.ArrayList<Critter>();
 		try{
 			//gets the Class of the desired critter type, then gets its constructor and creates a new instance of it
-			Class<?> cls = Class.forName("assignment4."+critter_class_name);
+			Class<?> cls = Class.forName("assignment5."+critter_class_name);
 			Constructor<?> newConstructor = cls.getConstructor();
 			Object obj = newConstructor.newInstance();
 			Critter newCritter = (Critter)obj;
@@ -508,12 +510,17 @@ public abstract class Critter {
 		}	
 	}
 	
+	//returns the world of critters
+	public static Critter[][] getCritters(){
+		return critterworld;
+	}
+	
 	//prints out the world's grid and all of the critters contained within it
 	public static void displayWorld() {
 		int numCols = Params.world_width;
 		int numRows = Params.world_height;
 		
-		Critter[][] critterworld = new Critter[numRows][numCols];
+		critterworld = new Critter[numRows][numCols];
 		
 		//nulls
 		for(int x = 0; x < numRows; x++){
@@ -528,7 +535,7 @@ public abstract class Critter {
 		}
 		
 		//draw grid
-		Main.start(critterworld);
+		Main.paint();
 	}
 	
 }
