@@ -1,5 +1,5 @@
-/* CRITTERS Critter.java
- * EE422C Project 4 submission by
+/* CRITTERS Critter2.java
+ * EE422C Project 5 submission by
  * Casey Cotter
  * cbc2298
  * 16445
@@ -11,6 +11,8 @@
  */
 
 package assignment5;
+
+import assignment5.Critter.CritterShape;
 
 /*
  * Critter2's main differences from Critter and the default Critter class is that it only fights with Algae,
@@ -34,7 +36,11 @@ public class Critter2 extends Critter {
 	 * If it is, it fights, if it isn't, it doesn't.
 	 * @param not_used is a string containing the type of Critter that Critter2 needs to decide whether to fight
 	 */
-	public boolean fight(String not_used) { 
+	public boolean fight(String not_used) {
+		boolean a = false;
+		if(look(dir, a).equals("A")){
+			return false;
+		}
 		if(not_used.equals("A") && sleepytime == 0){
 			sleepytime = 3;
 			sleepcount += 3;
@@ -66,4 +72,10 @@ public class Critter2 extends Critter {
 	public static void runStats(java.util.List<Critter> lazies) {
 		System.out.println(lazies.size() + " Lazies have slept for a total of " + sleepcount + " time steps");
 	}
+	
+	@Override
+	public CritterShape viewShape() { return CritterShape.SQUARE; }
+
+	@Override
+	public javafx.scene.paint.Color viewOutlineColor() { return javafx.scene.paint.Color.RED; }
 }

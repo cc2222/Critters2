@@ -1,6 +1,5 @@
-/* CRITTERS Critter.java
+/* Critter.java
  * EE422C Project 5 submission by
- * Replace <...> with your actual data.
  * Casey Cotter
  * cbc2298
  * 16445
@@ -13,25 +12,17 @@
 
 package assignment5;
 
-//import necessary files
+import java.lang.reflect.Constructor;
 import java.util.List;
 
 import assignment5.Critter;
-import assignment5.Critter.CritterShape;
-
-/* see the PDF for descriptions of the methods and fields in this class
- * you may add fields, methods or inner classes to Critter ONLY if you make your additions private
- * no new public, protected or default-package code or data can be added to Critter
- */
-import java.util.*;
-import java.lang.*;
-import java.lang.reflect.Constructor;
-import javafx.scene.*;
+import assignment5.InvalidCritterException;
+import assignment5.Params;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 
 public abstract class Critter {
-	
+	/* NEW FOR PROJECT 5 */
 	public enum CritterShape {
 		CIRCLE,
 		SQUARE,
@@ -60,20 +51,145 @@ public abstract class Critter {
 	
 	public abstract CritterShape viewShape(); 
 	
+	public static Shape getIcon(CritterShape x, Color outline, Color fill, Color total) {
+		Shape s = null; 
+		//double width = (500 + (Params.world_width/2))/Params.world_width;
+		//double height = (500 + (Params.world_height/2))/Params.world_height;
+		int width = 500/Params.world_width;
+		int height = 500/Params.world_height;
+		double widthoffset = width/12;
+		double heightoffset = height/12;
+		if(!total.equals(Color.WHITE)){
+			fill = total;
+			outline = total;
+		}
+		switch(x) { 
+			case CIRCLE: 
+				s = new Ellipse((width/2)-1, (height/2)-1);
+				s.setFill(fill); 
+				s.setStroke(outline);
+				break;
+			case SQUARE: 
+				s = new Rectangle(width-1, height-1);
+				s.setFill(fill); 
+				s.setStroke(outline); 
+				break;
+			case TRIANGLE: 
+				s = new Polygon();
+				((Polygon) s).getPoints().addAll(new Double[]{
+						0.0 + width/2, 0.0 + heightoffset,
+						0.0 - widthoffset + width, 0.0 - heightoffset + height,
+						0.0 + widthoffset, 0.0 - heightoffset + height});
+				s.setFill(fill); 
+				s.setStroke(outline); 
+				break;
+			case DIAMOND: 
+				s = new Polygon();
+				((Polygon) s).getPoints().addAll(new Double[]{
+						0.0 + width/2, 0.0 + heightoffset,
+						0.0 - widthoffset + width, 0.0 + height/2,
+						0.0 + width/2, 0.0 - heightoffset + height,
+						0.0 + widthoffset, 0.0 + height/2});
+				s.setFill(fill); 
+				s.setStroke(outline); 
+				break;
+			case STAR: 
+				s = new Polygon();
+				((Polygon) s).getPoints().addAll(new Double[]{
+						0.0 + width/2, 0.0 + heightoffset,
+						0.0 + width/2 + width/7, 0.0 + height/2 - height/7,
+						0.0 - widthoffset + width, 0.0 + height/2 - height/7,
+						0.0 + width/2 + width/7, 0.0 + height/2,
+						0.0 - widthoffset + width, 0.0 - heightoffset + height,
+						0.0 + width/2, 0.0 + height/2 + height/10,
+						0.0 + widthoffset, 0.0 - heightoffset + height,
+						0.0 + width/2 - width/7, 0.0 + height/2,
+						0.0 + widthoffset, 0.0 + height/2 - height/7,
+						0.0 + width/2 - width/7, 0.0 + height/2 - height/7});
+				s.setFill(fill); 
+				s.setStroke(outline); 
+				break;
+		}  
+		return s;
+	}
+	
 	private static String myPackage;
+	private int dir;
 	private	static List<Critter> population = new java.util.ArrayList<Critter>();
 	private static List<Critter> babies = new java.util.ArrayList<Critter>();
-
+	private static Critter[][] critterworld;
 	// Gets the package name.  This assumes that Critter and its subclasses are all in the same package.
 	static {
 		myPackage = Critter.class.getPackage().toString().split(" ")[1];
 	}
 	
-	protected String look(int direction, boolean steps) {return "";}
+	protected String look(int direction, boolean steps) {
+		int x = 0;
+		int y = 0;
+		int numsteps = 0;
+		if(steps == false)
+			numsteps = 1;
+		else
+			numsteps = 2;
+		switch(direction){
+			case 0: 
+				x = this.x_coord;
+				y = this.y_coord-numsteps;
+				break;
+			case 1: 
+				x = this.x_coord+numsteps;
+				y = this.y_coord-numsteps;
+				break;
+			case 2:
+				x = this.x_coord+numsteps;
+				y = this.y_coord;
+				break;
+			case 3:
+				x = this.x_coord+numsteps;
+				y = this.y_coord+numsteps;
+				break;
+			case 4:
+				x = this.x_coord;
+				y = this.y_coord+numsteps;
+				break;
+			case 5: 
+				x = this.x_coord-numsteps;
+				y = this.y_coord+numsteps;
+				break;
+			case 6:
+				x = this.x_coord-numsteps;
+				y = this.y_coord;
+				break;
+			case 7:
+				x = this.x_coord-numsteps;
+				y = this.y_coord-numsteps;
+				break;
+		}
+		if(x > Params.world_width-1){
+			x -= Params.world_width;
+		}
+		if(y > Params.world_height-1){
+			y -= Params.world_height;
+		}
+		if(x < 0){
+			x += Params.world_width;
+		}
+		if(y < 0){
+			y += Params.world_height;
+		}
+		for(int a = 0; a < population.size(); a++){
+			if(population.get(a).old_x == x && population.get(a).old_y == y){
+				this.energy -= Params.look_energy_cost;
+				return population.get(a).toString();
+			}
+		}
+		this.energy -= Params.look_energy_cost;
+		return null;
+		
+	}
 	
-	//project 4 code implementation starts here
+	/* rest is unchanged from Project 4 */
 	
-	private int dir;
 	
 	private static java.util.Random rand = new java.util.Random();
 	public static int getRandomInt(int max) {
@@ -84,36 +200,6 @@ public abstract class Critter {
 		rand = new java.util.Random(new_seed);
 	}
 	
-	static Shape getIcon(CritterShape x, Color outline, Color fill, Color total) {
-		Shape s = null; 
-		int size = 100;
-		
-		switch(x) { 
-			case CIRCLE: 
-				s = new Ellipse(size/2, size/2);
-				s.setFill(fill); 
-				break;
-			case SQUARE: 
-				s = new Circle(size/2);
-				s.setFill(javafx.scene.paint.Color.GREEN); 
-				break;
-			case TRIANGLE:
-				
-				break;
-			case DIAMOND:
-				
-				break;
-			case STAR:
-				
-				break;
-		} 
-		
-		// set the outline of the shape 
-		s.setStroke(javafx.scene.paint.Color.BLUE); 
-		// outline 
-		return s;
-	}
-/*  
 	
 	/* a one-character long string that visually depicts your critter in the ASCII interface */
 	public String toString() { return ""; }
@@ -123,10 +209,13 @@ public abstract class Critter {
 	
 	private int x_coord;
 	private int y_coord;
+	private int old_x;
+	private int old_y;
 	
 	//walks one space in the given direction
 	protected final void walk(int direction) {
-		
+		this.old_x = this.x_coord;
+		this.old_y = this.y_coord;
 		switch(direction){
 			case 0: this.x_coord++;
 					break;
@@ -167,7 +256,8 @@ public abstract class Critter {
 	
 	//walks two spaces in the given direction
 	protected final void run(int direction) {
-		
+		this.old_x = this.x_coord;
+		this.old_y = this.y_coord;
 		switch(direction){
 			case 0: this.x_coord += 2;
 					break;
@@ -247,7 +337,7 @@ public abstract class Critter {
 	public static void makeCritter(String critter_class_name) throws InvalidCritterException {
 		try{
 			//gets the Class of the desired critter types, then gets its constructor and creates a new instance of it
-			Class<?> cls = Class.forName("assignment4." + critter_class_name);
+			Class<?> cls = Class.forName("assignment5." + critter_class_name);
 			Constructor<?> newConstructor = cls.getConstructor();
 			Object obj = newConstructor.newInstance();
 			Critter newCritter = (Critter)obj;
@@ -264,8 +354,7 @@ public abstract class Critter {
 		}
 		catch(Exception e){
 			
-		}
-		
+		}	
 	}
 	
 	/**
@@ -278,7 +367,7 @@ public abstract class Critter {
 		List<Critter> result = new java.util.ArrayList<Critter>();
 		try{
 			//gets the Class of the desired critter type, then gets its constructor and creates a new instance of it
-			Class<?> cls = Class.forName("assignment4."+critter_class_name);
+			Class<?> cls = Class.forName("assignment5."+critter_class_name);
 			Constructor<?> newConstructor = cls.getConstructor();
 			Object obj = newConstructor.newInstance();
 			Critter newCritter = (Critter)obj;
@@ -298,7 +387,6 @@ public abstract class Critter {
 		catch(Exception e){
 			
 		}
-		
 		return result;
 	}
 	
@@ -330,11 +418,11 @@ public abstract class Critter {
 	 * create tests of your Critter model, you can create subclasses of this class
 	 * and then use the setter functions contained here. 
 	 * 
-	 * NOTE: you must make sure that the setter functions work with your implementation
+	 * NOTE: you must make sure thath the setter functions work with your implementation
 	 * of Critter. That means, if you're recording the positions of your critters
 	 * using some sort of external grid or some other data structure in addition
 	 * to the x_coord and y_coord functions, then you MUST update these setter functions
-	 * so that they correctly update your grid/data structure.
+	 * so that they correctup update your grid/data structure.
 	 */
 	static abstract class TestCritter extends Critter {
 		protected void setEnergy(int new_energy_value) {
@@ -357,30 +445,18 @@ public abstract class Critter {
 			return super.y_coord;
 		}
 		
-
-		/*
-		 * This method getPopulation has to be modified by you if you are not using the population
-		 * ArrayList that has been provided in the starter code.  In any case, it has to be
-		 * implemented for grading tests to work.
-		 */
+		//returns the list of critters
 		protected static List<Critter> getPopulation() {
 			return population;
 		}
 		
-		/*
-		 * This method getBabies has to be modified by you if you are not using the babies
-		 * ArrayList that has been provided in the starter code.  In any case, it has to be
-		 * implemented for grading tests to work.  Babies should be added to the general population 
-		 * at either the beginning OR the end of every timestep.
-		 */
+		//returns the list of babies
 		protected static List<Critter> getBabies() {
 			return babies;
 		}
 	}
-
-	/**
-	 * Clear the world of all critters, dead and alive
-	 */
+	
+	//Clears the world of all critters, dead or alive
 	public static void clearWorld() {
 		for(int a = 0; a < population.size(); a++){
 			Critter temp = population.get(a);
@@ -446,51 +522,32 @@ public abstract class Critter {
 		}	
 	}
 	
+	//returns the world of critters
+	public static Critter[][] getCritters(){
+		return critterworld;
+	}
+	
 	//prints out the world's grid and all of the critters contained within it
 	public static void displayWorld() {
-		int numCols = 2+Params.world_width;
-		int numRows = 2+Params.world_height;
+		int numCols = Params.world_width;
+		int numRows = Params.world_height;
 		
-		String[][] world = new String[numRows][numCols];
+		critterworld = new Critter[numRows][numCols];
 		
-		//white spaces
-		for(int x = 0; x < numRows; x++)
-		{
-			for(int y = 0; y < numCols; y++)
-			{
-				world[x][y] = " ";
+		//nulls
+		for(int x = 0; x < numRows; x++){
+			for(int y = 0; y < numCols; y++){
+				critterworld[x][y] = null;
 			}
 		}
-		//top and bottom rows
-		for(int a = 0; a < numCols; a++)
-		{
-			world[0][a] = "-";
-			world[numRows-1][a] = "-";
-		}
-		//left and right sides
-		for(int b = 0; b < numRows; b++)
-		{
-			world[b][0] = "|";
-			world[b][numCols-1] = "|";
-		}
-		//corners
-		world[0][0] = "+";
-		world[0][numCols-1] = "+";
-		world[numRows-1][0] = "+";
-		world[numRows-1][numCols-1] = "+";
+		
 		//critter positions
-		for(Critter temp : population)
-		{
-			world[(temp.y_coord)+1][(temp.x_coord)+1] = temp.toString();
+		for(Critter temp : population){
+			critterworld[temp.y_coord][temp.x_coord] = temp;
 		}
 		
-		for(int k = 0; k < numRows; k++)
-		{
-			for(int m = 0; m < numCols; m++)
-			{
-				System.out.print(world[k][m]);
-			}
-			System.out.println();
-		}
+		//draw grid
+		Main.paint();
 	}
+	
 }

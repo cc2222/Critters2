@@ -1,5 +1,5 @@
-/* CRITTERS Critter.java
- * EE422C Project 4 submission by
+/* CRITTERS Critter1.java
+ * EE422C Project 5 submission by
  * Casey Cotter
  * cbc2298
  * 16445
@@ -11,6 +11,8 @@
  */
 
 package assignment5;
+
+import assignment5.Critter.CritterShape;
 
 /*
  * Jumpers main difference from Critter is that it teleports in a random direction for a random number of steps (up to ten).
@@ -34,8 +36,10 @@ public class Critter1 extends Critter {
 
 	@Override
 	public void doTimeStep() {
-		/* teleport */
-		teleport();
+		boolean a = false;
+		if(look(dir, a) != null){
+			teleport();
+		}
 	}
 
 	//returns the number of teleports for all Jumpers(dead and alive)
@@ -65,4 +69,10 @@ public class Critter1 extends Critter {
 	public static void runStats(java.util.List<Critter> jumpers) {
 		System.out.println(jumpers.size() + " Jumpers have teleported a total of " + teleportcount + " times.");
 	}
+	
+	@Override
+	public CritterShape viewShape() { return CritterShape.TRIANGLE; }
+
+	@Override
+	public javafx.scene.paint.Color viewOutlineColor() { return javafx.scene.paint.Color.ORANGE; }
 }
