@@ -39,12 +39,18 @@ public abstract class Critter {
 	
 	public abstract CritterShape viewShape(); 
 	
+	/**
+	 * creates the proper shape/polygon for each critter, which allows for them to be drawn
+	 * @param x is the type of shape to be created
+	 * @param outline is the outline color for the shape
+	 * @param fill is the fill color for the shape
+	 * @param total is the overall color for the shape (overrides outline and fill if not WHITE)
+	 * @return the shape, in the correct color scheme
+	 */
 	public static Shape getIcon(CritterShape x, Color outline, Color fill, Color total) {
 		Shape s = null; 
-		//double width = (500 + (Params.world_width/2))/Params.world_width;
-		//double height = (500 + (Params.world_height/2))/Params.world_height;
-		int width = 500/Params.world_width;
-		int height = 500/Params.world_height;
+		double width = (500 + (Params.world_width/2))/Params.world_width;
+		double height = (500 + (Params.world_height/2))/Params.world_height;
 		double widthoffset = width/12;
 		double heightoffset = height/12;
 		if(!total.equals(Color.WHITE)){
@@ -106,11 +112,18 @@ public abstract class Critter {
 	private	static List<Critter> population = new java.util.ArrayList<Critter>();
 	private static List<Critter> babies = new java.util.ArrayList<Critter>();
 	private static Critter[][] critterworld;
+	
 	// Gets the package name.  This assumes that Critter and its subclasses are all in the same package.
 	static {
 		myPackage = Critter.class.getPackage().toString().split(" ")[1];
 	}
 	
+	/**
+	 * looks in a specific direction to check if a space is occupied, returns what type of critter, if any, occupies the space
+	 * @param direction is the direction in which to look
+	 * @param steps is whether to look 1 or 2 steps
+	 * @return a String of the type of critter currently occupying that space (null if empty)
+	 */
 	protected String look(int direction, boolean steps) {
 		int x = 0;
 		int y = 0;
@@ -173,7 +186,6 @@ public abstract class Critter {
 		}
 		this.energy -= Params.look_energy_cost;
 		return null;
-		
 	}
 	
 	/* rest is unchanged from Project 4 */
@@ -197,6 +209,8 @@ public abstract class Critter {
 	
 	private int x_coord;
 	private int y_coord;
+	
+	//added these so that I could use look during a worldTimeStep
 	private int old_x;
 	private int old_y;
 	
@@ -522,14 +536,14 @@ public abstract class Critter {
 		
 		critterworld = new Critter[numRows][numCols];
 		
-		//nulls
+		//sets all spaces to null first
 		for(int x = 0; x < numRows; x++){
 			for(int y = 0; y < numCols; y++){
 				critterworld[x][y] = null;
 			}
 		}
 		
-		//critter positions
+		//puts critters in their positions, overwriting some of the nulls
 		for(Critter temp : population){
 			critterworld[temp.y_coord][temp.x_coord] = temp;
 		}
